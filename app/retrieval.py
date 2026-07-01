@@ -19,15 +19,14 @@ def _tok(s: str) -> List[str]:
 
 
 class BM25:
-    """Standard Okapi BM25 with a postings index (only touches docs that
-    contain each query term)."""
+    """Okapi BM25 with a postings index (touches only docs containing a term)."""
 
     def __init__(self, docs_tokens: List[List[str]], k1: float = 1.5, b: float = 0.75):
         self.k1, self.b = k1, b
         self.N = len(docs_tokens)
         self.dl = [len(d) for d in docs_tokens]
         self.avgdl = (sum(self.dl) / self.N) if self.N else 0.0
-        self.postings: dict = defaultdict(list)  # term -> [(doc_idx, tf), ...]
+        self.postings: dict = defaultdict(list)
         for i, d in enumerate(docs_tokens):
             for term, tf in Counter(d).items():
                 self.postings[term].append((i, tf))
@@ -49,7 +48,6 @@ class BM25:
 
 
 def _rrf(rankings: List[List[int]], rrf_k: int = 60) -> List[int]:
-    """Reciprocal Rank Fusion: fused[d] = sum_i 1/(rrf_k + rank_i(d))."""
     fused: dict = defaultdict(float)
     for ranking in rankings:
         for rank, idx in enumerate(ranking):
@@ -57,39 +55,43 @@ def _rrf(rankings: List[List[int]], rrf_k: int = 60) -> List[int]:
     return sorted(fused, key=lambda i: -fused[i])
 
 
+def _normalize(mat: np.ndarray) -> np.ndarray:
+    norms = np.linalg.norm(mat, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+    return (mat / norms).astype(np.float32)
+
+
 class Retriever:
-    # Size of each single-retriever pool fed into the fusion step.
     POOL = 60
 
     def __init__(self, catalog: Catalog):
         self.catalog = catalog
-        from sentence_transformers import SentenceTransformer
+        from fastembed import TextEmbedding
 
-        self.model = SentenceTransformer(settings.embed_model)
+        self._embedder = TextEmbedding(model_name=settings.embed_model)
         texts = [a.embed_text() for a in catalog.items]
-        emb = self.model.encode(
-            texts, normalize_embeddings=True, convert_to_numpy=True, batch_size=8
-        )
-        self.matrix = emb.astype(np.float32)  # (N, d), L2-normalized
+        emb = np.array(list(self._embedder.embed(texts)), dtype=np.float32)
+        self.matrix = _normalize(emb)  # (N, d), L2-normalized
 
-        # Lexical index. Weight the name more than the description by repeating
-        # name tokens, so an exact product-name match ranks strongly.
         docs_tokens = [
             _tok(a.name) * 3 + _tok(a.test_type) + _tok(a.job_levels) + _tok(a.description)
             for a in catalog.items
         ]
         self.bm25 = BM25(docs_tokens)
 
+    def _embed_query(self, query: str) -> np.ndarray:
+        vec = np.array(list(self._embedder.embed([query]))[0], dtype=np.float32)
+        n = np.linalg.norm(vec)
+        return vec / n if n else vec
+
     def search(self, query: str, k: int) -> List[Tuple[Assessment, float]]:
         if not query.strip():
             return []
 
-        # Dense ranking.
-        q = self.model.encode([query], normalize_embeddings=True, convert_to_numpy=True)
-        dense_scores = (self.matrix @ q[0]).astype(float)
-        dense_rank = list(np.argsort(-dense_scores)[: self.POOL])
+        q = self._embed_query(query)
+        dense_scores = (self.matrix @ q).astype(float)
+        dense_rank = [int(i) for i in np.argsort(-dense_scores)[: self.POOL]]
 
-        # Lexical ranking (drop zero-score docs so RRF isn't fed noise).
         lex_scores = self.bm25.scores(_tok(query))
         lex_rank = [
             int(i)
@@ -97,13 +99,8 @@ class Retriever:
             if lex_scores[int(i)] > 0
         ]
 
-        fused = _rrf([[int(i) for i in dense_rank], lex_rank])
-        if not fused:  # degenerate fallback: pure dense
-            fused = [int(i) for i in dense_rank]
-
+        fused = _rrf([dense_rank, lex_rank]) or dense_rank
         k = min(k, len(fused))
-        # Pseudo-score = fusion rank position (higher = better); the selector
-        # only needs ordering, not calibrated scores.
         return [(self.catalog.items[idx], 1.0 / (1 + pos)) for pos, idx in enumerate(fused[:k])]
 
 
