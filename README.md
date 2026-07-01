@@ -1,8 +1,17 @@
+﻿---
+title: SHL Assessment Recommender
+emoji: 🎯
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 8000
+pinned: false
+---
 # SHL Conversational Assessment Recommender
 
 A stateless FastAPI agent that takes a recruiter from a vague intent
 ("I'm hiring a Java developer") to a grounded shortlist of SHL **Individual Test
-Solutions** through dialogue. It clarifies vague queries, recommends 1–10
+Solutions** through dialogue. It clarifies vague queries, recommends 1â€“10
 assessments, refines on constraint changes, compares two assessments from
 catalog data, and refuses anything off-topic or any prompt-injection attempt.
 
@@ -64,6 +73,7 @@ secret. `/health` and `/chat` will be reachable at your service URL. Free
 instances cold-start within the 2-minute window the spec allows.
 
 ## Endpoints
-- `GET /health` → `{"status":"ok"}` (200)
-- `POST /chat` → `{"reply": str, "recommendations": [...], "end_of_conversation": bool}`
-  - `recommendations` empty while clarifying/refusing; 1–10 items on a shortlist.
+- `GET /health` â†’ `{"status":"ok"}` (200)
+- `POST /chat` â†’ `{"reply": str, "recommendations": [...], "end_of_conversation": bool}`
+  - `recommendations` empty while clarifying/refusing; 1â€“10 items on a shortlist.
+
