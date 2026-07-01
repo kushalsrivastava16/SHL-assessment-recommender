@@ -68,7 +68,7 @@ class Retriever:
         self.model = SentenceTransformer(settings.embed_model)
         texts = [a.embed_text() for a in catalog.items]
         emb = self.model.encode(
-            texts, normalize_embeddings=True, convert_to_numpy=True, batch_size=64
+            texts, normalize_embeddings=True, convert_to_numpy=True, batch_size=8
         )
         self.matrix = emb.astype(np.float32)  # (N, d), L2-normalized
 
