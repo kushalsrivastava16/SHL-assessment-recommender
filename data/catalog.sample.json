@@ -1,0 +1,68 @@
+[
+  {
+    "id": "java-8-new",
+    "name": "Java 8 (New)",
+    "url": "https://www.shl.com/solutions/products/product-catalog/view/java-8-new/",
+    "test_type": "K",
+    "description": "Multi-choice test that measures the knowledge of core Java 8 concepts, syntax, collections, concurrency and common libraries for developers.",
+    "job_levels": "Mid-Professional, Professional Individual Contributor",
+    "remote": true,
+    "adaptive": false,
+    "duration": "30 minutes"
+  },
+  {
+    "id": "core-java-advanced-level-new",
+    "name": "Core Java (Advanced Level) (New)",
+    "url": "https://www.shl.com/solutions/products/product-catalog/view/core-java-advanced-level-new/",
+    "test_type": "K",
+    "description": "Advanced Java knowledge test covering JVM internals, multithreading, generics and performance for experienced engineers.",
+    "job_levels": "Professional Individual Contributor, Mid-Professional",
+    "remote": true,
+    "adaptive": false,
+    "duration": "40 minutes"
+  },
+  {
+    "id": "occupational-personality-questionnaire-opq32r",
+    "name": "Occupational Personality Questionnaire OPQ32r",
+    "url": "https://www.shl.com/solutions/products/product-catalog/view/occupational-personality-questionnaire-opq32r/",
+    "test_type": "P",
+    "description": "Measures 32 personality characteristics relevant to workplace behavior, including how a person relates to others, their thinking style and feelings, useful for roles requiring stakeholder collaboration and leadership.",
+    "job_levels": "All levels",
+    "remote": true,
+    "adaptive": false,
+    "duration": "25 minutes"
+  },
+  {
+    "id": "global-skills-assessment",
+    "name": "Global Skills Assessment (GSA)",
+    "url": "https://www.shl.com/solutions/products/product-catalog/view/global-skills-assessment/",
+    "test_type": "C, P",
+    "description": "Assesses a broad set of transferable workplace competencies and behaviors used to benchmark talent across roles and geographies.",
+    "job_levels": "All levels",
+    "remote": true,
+    "adaptive": false,
+    "duration": "30 minutes"
+  },
+  {
+    "id": "verify-g-plus-numerical",
+    "name": "Verify G+ Numerical Reasoning",
+    "url": "https://www.shl.com/solutions/products/product-catalog/view/verify-g-plus-numerical/",
+    "test_type": "A",
+    "description": "Adaptive numerical reasoning test measuring the ability to interpret data in tables and graphs and make logical deductions.",
+    "job_levels": "Graduate, Professional Individual Contributor",
+    "remote": true,
+    "adaptive": true,
+    "duration": "18 minutes"
+  },
+  {
+    "id": "situational-judgement-test",
+    "name": "Situational Judgement Test",
+    "url": "https://www.shl.com/solutions/products/product-catalog/view/situational-judgement-test/",
+    "test_type": "B",
+    "description": "Presents realistic workplace scenarios to assess judgment, decision making and behavioral tendencies including working with stakeholders.",
+    "job_levels": "Entry, Mid-Professional",
+    "remote": true,
+    "adaptive": false,
+    "duration": "20 minutes"
+  }
+]
